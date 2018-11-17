@@ -1,5 +1,5 @@
 # Flashbackscraper
-A simple python script for scraping Flasbach forum threads.
+A simple python script for scraping Flasback forum threads.
 
 ## Requirements
 
