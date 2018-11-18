@@ -23,7 +23,7 @@ or...
 
     python flashbackscraper.py https://www.flashback.org/t2977018
 
-See the example output sqlite3/csv files.
+See the example_output folder for  sqlite3/csv files.
 
 
 ## Extras
@@ -32,4 +32,4 @@ If you want to map the network created as an effect of the "quote" function in t
 
     python sqlite2gexf <name of sqlite3 file>
 
-See the file ``t2977018.gexf`` for an example. 
+See the file ``t2977018.gexf`` for an example in the example_outputs folder. 
