@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf version="1.2" xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+  <graph defaultedgetype="directed" mode="static" name="">
+    <meta>
+      <creator>NetworkX 2.1</creator>
+      <lastmodified>18/11/2018</lastmodified>
+    </meta>
+    <nodes>
+      <node id="Filling" label="Filling" />
+      <node id="Nochills" label="Nochills" />
+      <node id="JojjeMeduza" label="JojjeMeduza" />
+      <node id="NontoxicPlaydoh" label="NontoxicPlaydoh" />
+      <node id="mand71" label="mand71" />
+      <node id="Fastslurp" label="Fastslurp" />
+      <node id="gefundenes" label="gefundenes" />
+      <node id="Sheen999" label="Sheen999" />
+    </nodes>
+    <edges>
+      <edge id="0" source="Nochills" target="mand71" />
+      <edge id="1" source="JojjeMeduza" target="Filling" />
+      <edge id="2" source="NontoxicPlaydoh" target="gefundenes" />
+      <edge id="3" source="mand71" target="Nochills" />
+      <edge id="4" source="Fastslurp" target="Sheen999" />
+    </edges>
+  </graph>
+</gexf>
