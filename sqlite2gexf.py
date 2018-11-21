@@ -1,3 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# Author: christopher.kullenberg@gu.se
+# Usage: python sqlite2gexf.py <sqlite3 file>
+
 import networkx as nx
 import sqlite3
 import sys
@@ -11,6 +16,7 @@ selectedges = cursor.execute('SELECT user, inreply FROM fb')
 edges = cursor.fetchall()
 
 G = nx.DiGraph()
+
 for e in edges:
     if e[1] == 'none':
          continue
