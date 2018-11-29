@@ -33,6 +33,8 @@ def parsethread(nexturl):
     postbody = soup.findAll("div", class_="post_message")
     username = soup.findAll("li", class_="dropdown-header")
     heading = soup.findAll("div", class_="post-heading")
+    titlediv = soup.findAll("div", class_="page-title")
+    title = titlediv[0].text
     print("Length: " + str(len(postbody)))
     for p in postbody:
         postid = re.findall("(?<=id\=\"post\_message\_).*?(?=\"\>)", str(p), 
@@ -79,16 +81,16 @@ def parsethread(nexturl):
         print("Adding post", str(((counter * 12) + n) - 12), "to database")
         try:
             cursor.execute('''
-            INSERT INTO fb(idnumber, user, date, time, body, inreply)
-            VALUES(?,?,?,?,?,?)''', 
+            INSERT INTO fb(idnumber, user, date, time, body, inreply, title)
+            VALUES(?,?,?,?,?,?,?)''', 
             (postidlist[n], userlist[n], datelist[n], timelist[n], 
-             bodylist[n], inreplylist[n])
+             bodylist[n], inreplylist[n], title)
             )
             db.commit()
         except (IndexError, sqlite3.IntegrityError) as e:
              print("\nEnd of thread\nWriting sqlite3 and csv files\nExiting...")
              header = ['rownumber', 'idnumber', 'user', 'date', 
-                       'time', 'body', 'inreply']
+                       'time', 'body', 'inreply', 'title']
              outfile = open(nexturl[26:-2] + ".csv", "w")
              csvWriter = csv.writer(outfile)
              csvWriter.writerow(i for i in header)
@@ -107,8 +109,7 @@ if __name__ == '__main__':
         db = sqlite3.connect(starturl[26:] + '.sqlite3')
         cursor = db.cursor()
         cursor.execute('''
-            CREATE TABLE fb(id INTEGER PRIMARY KEY, idnumber TEXT UNIQUE, user TEXT,
-                         date TEXT, time TEXT, body TEXT, inreply TEXT)
+            CREATE TABLE fb(id INTEGER PRIMARY KEY, idnumber TEXT UNIQUE, user TEXT, date TEXT, time TEXT, body TEXT, inreply TEXT, title TEXT)
          ''')
         db.commit()
         while True:
