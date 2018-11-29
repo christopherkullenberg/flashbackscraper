@@ -89,7 +89,7 @@ def parsethread(nexturl):
              print("\nEnd of thread\nWriting sqlite3 and csv files\nExiting...")
              header = ['rownumber', 'idnumber', 'user', 'date', 
                        'time', 'body', 'inreply']
-             outfile = open(nexturl[26:] + ".csv", "w")
+             outfile = open(nexturl[26:-2] + ".csv", "w")
              csvWriter = csv.writer(outfile)
              csvWriter.writerow(i for i in header)
              rows = cursor.execute('SELECT * FROM fb')
