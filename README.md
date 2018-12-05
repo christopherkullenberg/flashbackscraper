@@ -1,6 +1,9 @@
 # Flashbackscraper
 A simple python script for scraping Flasback forum threads.
 
+![Terminal demo](https://digitalametoder.science/files/render1544006868267.gif)
+
+
 ## Requirements
 
 * Python3
