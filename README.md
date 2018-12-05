@@ -35,7 +35,23 @@ See the example_output folder for  sqlite3/csv files.
 
 ### Example
 
-    python flashbackscraper -f filewithurls.txt
+    python flashbackscraper.py -f filewithurls.txt
+
+## Usage, scrape subforum for thread urls and write to file
+
+    python flashbackscraper.py -s <URL to subforum>
+
+
+### Example
+
+    python3 flashbackscraper.py -s https://www.flashback.org/f328
+
+Then you can run the ``-f`` option, as above, to get all the posts of all the trhreads in a subforum. For example, the above command will produce a text file called ``f328.txt`` which then can be scraped with
+
+    python flashbackscraper.py -f f328.txt
+
+**Warning:** This will create a lot of requests and network traffic. **Use responsibly!**. 
+
 
 
 ## Extras

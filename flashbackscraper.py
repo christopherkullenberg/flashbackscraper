@@ -29,6 +29,7 @@ text = '''
 parser = argparse.ArgumentParser(description = text)
 parser.add_argument("-f", "--file", help="scrape from file containing a list of urls, separated by newline")
 parser.add_argument("-u", "--url", help="scrape forum thread from URL")
+parser.add_argument("-s", "--subforum", help="scrape an entire subforum")
 
 args = parser.parse_args()
 
@@ -123,6 +124,35 @@ def parsethread(nexturl, cursor, db, mode):
             
     return(int(len(postsoup)))
 
+def parsesubforum(subforumurl):
+    iterator = 1
+    outfile = open(subforumurl[26:] + ".txt", "w")
+    while True:
+        currenturl = subforumurl + "p" + str(iterator)
+        r = requests.get(currenturl)
+        html = r.content
+        soup = BeautifulSoup(html, "lxml")
+        #print(soup)
+        print("Collecting threads from", currenturl)
+        topics = soup.findAll('a', id=re.compile("thread_title_\d"))
+        print("Found " + str(len(topics)) + " threads")
+        if len(topics) == 50:
+            for t in topics:
+                threadurl = 'https://flashback.org' + t.get('href')
+                print(threadurl)
+                outfile.write(threadurl + "\n")
+            iterator += 1
+        elif len(topics) != 50:
+            for t in topics:
+                threadurl = 'https://flashback.org' + t.get('href')
+                print(threadurl)
+                outfile.write(threadurl + "\n")
+            print("Done, writing to file and exiting")
+            outfile.close()
+            print('''\n You can now run python3 flashbackscraper.py -f ''' 
+                  + subforumurl[26:] + '''.txt''')
+            sys.exit()
+ 
 def iterator(starturl, cursor, db, mode):
     urlcounter = 1
     listcounter = 0   
@@ -187,8 +217,6 @@ def createdatabase(starturl, mode):
         sys.exit()
 
 
-
-
 if __name__ == '__main__':
     if args.url:
         createdatabase(args.url, "singleurl")
@@ -204,3 +232,6 @@ if __name__ == '__main__':
             crawlurlcounter += 1
         print("\n")
         createdatabase(lines, "file")
+    elif args.subforum:
+        parsesubforum(args.subforum)
+
