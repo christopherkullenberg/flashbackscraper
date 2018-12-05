@@ -99,17 +99,17 @@ def parsethread(nexturl, cursor, db, mode):
             )
             db.commit()
         except (IndexError, sqlite3.IntegrityError) as e:
-             header = ['rownumber', 'idnumber', 'user', 'date', 
-                       'time', 'body', 'inreply', 'title']
-             outfile = open(nexturl[26:-2] + ".csv", "w")
-             csvWriter = csv.writer(outfile)
-             csvWriter.writerow(i for i in header)
-             rows = cursor.execute('SELECT * FROM fb')
-             csvWriter.writerows(rows)
-             outfile.close()
              if mode == "singleurl":
+                 header = ['rownumber', 'idnumber', 'user', 'date', 
+                           'time', 'body', 'inreply', 'title']
+                 outfile = open(nexturl[26:-2] + ".csv", "w")
+                 csvWriter = csv.writer(outfile)
+                 csvWriter.writerow(i for i in header)
+                 rows = cursor.execute('SELECT * FROM fb')
+                 csvWriter.writerows(rows)
+                 outfile.close()
                  sys.exit()
-             elif mode == "file":
+             else:
                  continue
             
     return(int(len(postsoup)))
