@@ -14,16 +14,25 @@ or...
 
     pip install beautifulsoup4
 
-## Usage
+## Usage, single thread mode
 
-    python flashbackscraper.py <URL to flashback thread>
+    python flashbackscraper.py -u <URL to flashback thread>
 
 
-## Example
+### Example
 
-    python flashbackscraper.py https://www.flashback.org/t2977018
+    python flashbackscraper.py -u https://www.flashback.org/t2977018
 
 See the example_output folder for  sqlite3/csv files.
+
+## Usage, multiple threads from file mode
+
+    python flashbackscraper -f <file with newline separated urls>
+
+
+### Example
+
+    python flashbackscraper -f filewithurls.txt
 
 
 ## Extras
