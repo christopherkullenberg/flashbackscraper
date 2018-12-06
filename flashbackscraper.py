@@ -31,6 +31,9 @@ parser.add_argument("-u", "--url", help="scrape forum thread from URL")
 parser.add_argument("-s", "--subforum", help="scrape an entire subforum")
 args = parser.parse_args()
 
+
+previouslyaddedbody = []
+
 def parsethread(nexturl, cursor, db, mode):
     '''This is the main parser for flashback threads. It receives URLs from\
     the iterator, then extracts content and meta-data of each post before\
@@ -82,6 +85,13 @@ def parsethread(nexturl, cursor, db, mode):
     for p in postsoup:
         postbody = re.sub(r"[\n\t]*", "", p.text)
         bodylist.append(postbody)
+    checksum = int(len(bodylist)) # This val returns to iterator() 
+    global previouslyaddedbody # fetch global variable
+    if bodylist == previouslyaddedbody:
+        print("Found duplicate page, exiting or continuing to next url")
+        checksum = 9000  # return a fake number to break the loop
+    else: 
+        print("OK")
     for p in postsoup:
         match = re.findall("(?<=Ursprungligen postat av ).*", p.text, 
                            re.IGNORECASE)
@@ -111,8 +121,8 @@ def parsethread(nexturl, cursor, db, mode):
                  sys.exit()
              else:
                  continue
-            
-    return(int(len(postsoup)))
+    previouslyaddedbody = bodylist
+    return(checksum)
 
 def parsesubforum(subforumurl):
     iterator = 1
@@ -156,11 +166,15 @@ def iterator(starturl, cursor, db, mode):
                 nexturl = starturl[listcounter] + "p" + str(urlcounter)
                 if parsethread(nexturl, cursor, db, "file") == 12:
                     urlcounter += 1
-                    #print("Scraping a full page")
-                elif parsethread(nexturl, cursor, db, "file") != 12:
-                    #print("Scraping partial page. Continuing to next url.")
+                    print("Scraping a full page")
+                elif parsethread(nexturl, cursor, db, "file") < 12:
+                    print("Scraping partial page. Continuing to next url.")
                     urlcounter = 1
-                    listcounter +=1
+                    listcounter += 1
+                elif parsethread(nexturl, cursor, db, "file") == 9000:
+                    print("Error 9000: Duplicate, lets move on")
+                    urlcounter = 1
+                    listcounter += 1
             except IndexError:
                 print("\n\n*** No more URLs, done! ***")
                 sys.exit()
