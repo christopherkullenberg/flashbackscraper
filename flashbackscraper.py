@@ -52,8 +52,11 @@ def parsethread(nexturl, cursor, db, mode):
     soup = BeautifulSoup(html, "lxml")
     postsoup = soup.findAll("div", class_="post_message")
     heading = soup.findAll("div", class_="post-heading")
-    titlediv = soup.find("div", class_="page-title")
-    title = re.sub(r"[\n\t]*", "", titlediv.text)
+    try:
+        titlediv = soup.find("div", class_="page-title")
+        title = re.sub(r"[\n\t]*", "", titlediv.text)
+    except:
+        title = "<error getting title>" # if title extraction fails.
     print("---> Thread title:", title)
     username = soup.findAll("li", class_="dropdown-header")
     print("---> Length of page: " + str(len(postsoup)) + " posts.")
