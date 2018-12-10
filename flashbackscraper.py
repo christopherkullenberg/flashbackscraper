@@ -36,40 +36,46 @@ previouslyaddedbody = []
 
 def parsethread(nexturl, cursor, db, mode):
     '''This is the main parser for flashback threads. It receives URLs from\
-    the iterator, then extracts content and meta-data of each post before\
+    iterator(), then extracts content and meta-data of each post before\
     saving it all to a common sqlite3 database. For each thread, it also\
     saves a csv file. Sorry for the ugly complexity of this function...'''
     print("\nScraping page:", nexturl)
     threadnumber = nexturl[26:]
+    # Create arrays of data containing parsed page content:
     postidlist = []
     userlist = []
     datelist = []
     timelist = []
     bodylist = []
     inreplylist = []
+    # Get and parse html:
     r = requests.get(nexturl)
     html = r.content
     soup = BeautifulSoup(html, "lxml")
+    # Extract the posts and their headings
     postsoup = soup.findAll("div", class_="post_message")
     heading = soup.findAll("div", class_="post-heading")
     try:
         titlediv = soup.find("div", class_="page-title")
-        title = re.sub(r"[\n\t]*", "", titlediv.text)
+        title = re.sub(r"[\n\t]*", "", titlediv.text) # clean out tab, newlines
     except:
         title = "<error getting title>" # if title extraction fails.
     print("---> Thread title:", title)
-    username = soup.findAll("li", class_="dropdown-header")
+    # If length == 12 it is a full page:
     print("---> Length of page: " + str(len(postsoup)) + " posts.")
     for p in postsoup:
         postid = re.findall("(?<=id\=\"post\_message\_).*?(?=\"\>)", str(p), 
                             re.IGNORECASE)
         if postid:
             postidlist.append(postid[0])
+    # Extract usernames:     
+    username = soup.findAll("li", class_="dropdown-header")
     for u in username:
-        if u.text == "Ämnesverktyg":
+        if u.text == "Ämnesverktyg": # exclude false positive.
             continue
         else:
             userlist.append(u.text)
+    # Datetime extractor
     for h in heading:
         yesterday = datetime.date.today() - datetime.timedelta(1)
         todaymatch = re.findall("Idag,\s\d\d\:\d\d", h.text, re.IGNORECASE)
@@ -86,11 +92,11 @@ def parsethread(nexturl, cursor, db, mode):
             datelist.append(match[0][:10])
             timelist.append(match[0][12:])
     for p in postsoup:
-        postbody = re.sub(r"[\n\t]*", "", p.text)
+        postbody = re.sub(r"[\n\t]*", "", p.text) # clean out tab, newlines
         bodylist.append(postbody)
     checksum = int(len(bodylist)) # This val returns to iterator() 
-    global previouslyaddedbody # fetch global variable
-    if bodylist == previouslyaddedbody:
+    global previouslyaddedbody # fetch global variable, see top of this file.
+    if bodylist == previouslyaddedbody: # test if previous page is identical.
         print("Found duplicate page, exiting or continuing to next url")
         checksum = 9000  # return a fake number to break the loop
     else: 
@@ -102,6 +108,7 @@ def parsethread(nexturl, cursor, db, mode):
             inreplylist.append(match[0])
         else:
             inreplylist.append("none")
+    # And now add to database: 
     for n in range(0,12):
         try:
             cursor.execute('''
@@ -112,22 +119,29 @@ def parsethread(nexturl, cursor, db, mode):
             )
             db.commit()
         except (IndexError, sqlite3.IntegrityError) as e:
-             if mode == "singleurl":
+            '''If database writing fails, An indexerror means no more posts, 
+            a sqlite3.IntegrityError means the database found a duplicate 
+            idnumber, then a .csv file is written
+            and the script exits.''' 
+            if mode == "singleurl":
                  header = ['rownumber', 'idnumber', 'user', 'date', 
                            'time', 'body', 'inreply', 'title']
                  outfile = open(nexturl[26:-2] + ".csv", "w")
                  csvWriter = csv.writer(outfile)
                  csvWriter.writerow(i for i in header)
-                 rows = cursor.execute('SELECT * FROM fb')
+                 rows = cursor.execute('SELECT * FROM fb') # All data from db
                  csvWriter.writerows(rows)
                  outfile.close()
                  sys.exit()
-             else:
+            else: # If file or subforum mode is selected, just continue.
                  continue
-    previouslyaddedbody = bodylist
-    return(checksum)
+    previouslyaddedbody = bodylist # Fills global variable with the current data
+    return(checksum) # Finally, return to iterator() the checksum value.
 
 def parsesubforum(subforumurl):
+    '''This is a special function that crawls through a subforum in order to 
+    find thread urls. Once it has interated through all the pages listing thread
+    urls and writing them to a file, it closes the file and exits.'''
     iterator = 1
     outfile = open(subforumurl[26:] + ".txt", "w")
     while True:
@@ -156,6 +170,9 @@ def parsesubforum(subforumurl):
             sys.exit()
  
 def iterator(starturl, cursor, db, mode):
+    '''This function makes possible to go through all urls in a thread. It 
+    takes the first url of a thread, then simply adds "p[n]", where n = a number    increasing by 1 until it receives a number which is either less than 12 or 
+    the error message 9000.'''
     urlcounter = 1
     listcounter = 0   
     while True:
