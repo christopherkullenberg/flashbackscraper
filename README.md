@@ -56,6 +56,11 @@ Then you can run the ``-f`` option, as above, to get all the posts of all the tr
 
 ## Extras
 
+### Run scraper through Tor darknet
+
+By adding the ``-t`` flag, you may run the https requests through the Tor socks5 proxy on port 9050. This requires that you have [Tor installed](https://torproject.org) on your system and that there is a functioning proxy on the standard Tor port. This feature is still a bit experimental, so **do not rely on it for anonymity**. 
+
+### Network analyisis file
 If you want to map the network created as an effect of the "quote" function in the Flashback forum, there is a script, ``sqlite2gexf.py`` that converts the scraped data to a .gexf file, which can be opened in for instance [Gephi](https://gephi.org). The script requires the module [networkx](https://networkx.github.io/), then you can simply run:
 
     python sqlite2gexf <name of sqlite3 file>

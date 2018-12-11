@@ -29,10 +29,13 @@ parser.add_argument("-f", "--file",
                     help="scrape from file containing a list of urls, separated\                    by newline")
 parser.add_argument("-u", "--url", help="scrape forum thread from URL")
 parser.add_argument("-s", "--subforum", help="scrape an entire subforum")
+parser.add_argument("-t", "--tor", help="run scraper though Tor proxy on\
+                    on localhost:9050 (socks5 proxy)", action="store_true")
 args = parser.parse_args()
 
 
 previouslyaddedbody = []
+usetor = False # the -t argument switches this on.
 
 def parsethread(nexturl, cursor, db, mode):
     '''This is the main parser for flashback threads. It receives URLs from\
@@ -49,7 +52,13 @@ def parsethread(nexturl, cursor, db, mode):
     bodylist = []
     inreplylist = []
     # Get and parse html:
-    r = requests.get(nexturl)
+    global usetor # Check if Tor mode is on or off
+    if usetor == True:
+        session = requests.session()
+        session.proxies['https'] = 'socks5h://localhost:9050' # requires Tor
+        r = session.get(nexturl)
+    elif usetor == False:
+        r = requests.get(nexturl)
     html = r.content
     soup = BeautifulSoup(html, "lxml")
     # Extract the posts and their headings
@@ -238,6 +247,8 @@ def createdatabase(starturl, mode):
         sys.exit()
 
 if __name__ == '__main__':
+    if args.tor:
+        usetor = True
     if args.url:
         createdatabase(args.url, "singleurl")
     elif args.file:
