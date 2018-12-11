@@ -54,6 +54,7 @@ def parsethread(nexturl, cursor, db, mode):
     # Get and parse html:
     global usetor # Check if Tor mode is on or off
     if usetor == True:
+        print("---> Running in Tor mode!")
         session = requests.session()
         session.proxies['https'] = 'socks5h://localhost:9050' # requires Tor
         r = session.get(nexturl)
@@ -249,6 +250,12 @@ def createdatabase(starturl, mode):
 if __name__ == '__main__':
     if args.tor:
         usetor = True
+        testsession = requests.session()
+        testsession.proxies['https'] = 'socks5h://localhost:9050'
+        testr = testsession.get("https://httpbin.org/ip")
+        print("Fetching Tor IP once for testing...")
+        print(testr.text)
+        print("If the IP above is your real IP, Tor mode has failed")
     if args.url:
         createdatabase(args.url, "singleurl")
     elif args.file:
