@@ -51,6 +51,7 @@ def parsethread(nexturl, cursor, db, mode):
     timelist = []
     bodylist = []
     inreplylist = []
+    pathlist = []
     # Get and parse html:
     global usetor # Check if Tor mode is on or off
     if usetor == True:
@@ -126,10 +127,11 @@ def parsethread(nexturl, cursor, db, mode):
     for n in range(0,12):
         try:
             cursor.execute('''
-            INSERT INTO fb(idnumber, user, date, time, body, inreply, title)
-            VALUES(?,?,?,?,?,?,?)''', 
+            INSERT INTO fb(idnumber, user, date, time, body, 
+                           inreply, title, path)
+            VALUES(?,?,?,?,?,?,?,?)''', 
             (postidlist[n], userlist[n], datelist[n], timelist[n], 
-             bodylist[n], inreplylist[n], title)
+             bodylist[n], inreplylist[n], title, str(parseforumstructure(soup)))
             )
             db.commit()
         except (IndexError, sqlite3.IntegrityError) as e:
@@ -139,7 +141,7 @@ def parsethread(nexturl, cursor, db, mode):
             and the script exits.''' 
             if mode == "singleurl":
                  header = ['rownumber', 'idnumber', 'user', 'date', 
-                           'time', 'body', 'inreply', 'title']
+                           'time', 'body', 'inreply', 'title', 'path']
                  outfile = open(nexturl[26:-2] + ".csv", "w")
                  csvWriter = csv.writer(outfile)
                  csvWriter.writerow(i for i in header)
@@ -151,6 +153,15 @@ def parsethread(nexturl, cursor, db, mode):
                  continue
     previouslyaddedbody = bodylist # Fills global variable with the current data
     return(checksum) # Finally, return to iterator() the checksum value.
+
+def parseforumstructure(soup):
+    pathdiv = soup.find("div", class_="form-group")
+    pathdata = pathdiv.findAll("option")
+    pathlist = []
+    for p in pathdata:
+        if p.text != "Detta ämne":
+            pathlist.append(p.text)
+    return(pathlist)
 
 def parsesubforum(subforumurl):
     '''This is a special function that crawls through a subforum in order to 
@@ -219,7 +230,6 @@ def startscraping(url, cursor, db, mode):
     while True:
         iterator(url, cursor, db, mode)
 
-
 def createdatabase(starturl, mode):
     '''This function creates a database, then starts the scraper differently\
        depending on mode'''
@@ -235,7 +245,7 @@ def createdatabase(starturl, mode):
         cursor.execute('''
             CREATE TABLE fb(id INTEGER PRIMARY KEY, idnumber TEXT UNIQUE,\
             user TEXT, date TEXT, time TEXT, body TEXT, inreply TEXT,\
-             title TEXT)
+             title TEXT, path TEXT)
             ''')
         db.commit()
         if mode == "singleurl":
