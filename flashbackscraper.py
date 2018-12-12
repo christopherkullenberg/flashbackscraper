@@ -55,9 +55,13 @@ def parsethread(nexturl, cursor, db, mode):
     global usetor # Check if Tor mode is on or off
     if usetor == True:
         print("---> Running in Tor mode!")
-        session = requests.session()
-        session.proxies['https'] = 'socks5h://localhost:9050' # requires Tor
-        r = session.get(nexturl)
+        try:
+            session = requests.session()
+            session.proxies['https'] = 'socks5h://localhost:9050' # requires Tor
+            r = session.get(nexturl)
+        except: #there are multiple errors for a Tor conn to go wrong
+            print("There was an ERROR with TOR. Proceeding to next url")
+            return(9000)
     elif usetor == False:
         r = requests.get(nexturl)
     html = r.content
