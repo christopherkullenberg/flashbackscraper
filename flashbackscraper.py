@@ -62,6 +62,8 @@ def parsethread(nexturl, cursor, db, mode):
             r = session.get(nexturl)
         except: #there are multiple errors for a Tor conn to go wrong
             print("There was an ERROR with TOR. Proceeding to next url")
+            with open("failed_urls.txt", "a") as failfile:
+                failfile.write(nexturl + "\n") # record failed urls
             return(9000)
     elif usetor == False:
         r = requests.get(nexturl)
