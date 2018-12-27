@@ -1,7 +1,14 @@
 # Flashbackscraper
-A simple python script for scraping Flasback forum threads.
+A simple python script for scraping [Flasback.org](https://flashback.org) forum threads. It uses BeautifulSoup to parse the html responses from the forum, this way avoiding any (known) limitations in how much data can be fetched. Features include:
+
+* Scraping of entire threads.
+* Scraping of multiple threads from a file list.
+* Scraping a subforum for thread urls, which then can be scraped as multiple threads.
+* Running the scraper through the Tor socks5 proxy (experimental feature, do not use for opsec). 
 
 ![Terminal demo](https://digitalametoder.science/files/render1544006868267.gif)
+
+*Note*: Use responsibly with regards to network usage and potential privacy aspects.
 
 
 ## Requirements

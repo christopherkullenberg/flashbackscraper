@@ -33,9 +33,12 @@ parser.add_argument("-t", "--tor", help="run scraper though Tor proxy on\
                     on localhost:9050 (socks5 proxy)", action="store_true")
 args = parser.parse_args()
 
-
 previouslyaddedbody = []
 usetor = False # the -t argument switches this on.
+headers = {
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"
+}
+
 
 def parsethread(nexturl, cursor, db, mode):
     '''This is the main parser for flashback threads. It receives URLs from\
@@ -54,19 +57,20 @@ def parsethread(nexturl, cursor, db, mode):
     pathlist = []
     # Get and parse html:
     global usetor # Check if Tor mode is on or off
+    global headers # get headers
     if usetor == True:
         print("---> Running in Tor mode!")
         try:
             session = requests.session()
             session.proxies['https'] = 'socks5h://localhost:9050' # requires Tor
-            r = session.get(nexturl)
+            r = session.get(nexturl, headers=headers)
         except: #there are multiple errors for a Tor conn to go wrong
             print("There was an ERROR with TOR. Proceeding to next url")
             with open("failed_urls.txt", "a") as failfile:
                 failfile.write(nexturl + "\n") # record failed urls
             return(9000)
     elif usetor == False:
-        r = requests.get(nexturl)
+        r = requests.get(nexturl, headers=headers)
     html = r.content
     soup = BeautifulSoup(html, "lxml")
     # Extract the posts and their headings
