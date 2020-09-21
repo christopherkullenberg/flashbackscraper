@@ -82,6 +82,8 @@ def parsethread(nexturl, cursor, db, mode):
     # Extract the posts and their headings
     postsoup = soup.findAll("div", class_="post_message")
     heading = soup.findAll("div", class_="post-heading")
+    # Extract all moderator messages
+    modsoup = soup.findAll("div", class_="panel panel-warning panel-form")
     try:
         titlediv = soup.find("div", class_="page-title")
         title = re.sub(r"[\n\t]*", "", titlediv.text) # clean out tab, newlines
@@ -121,7 +123,8 @@ def parsethread(nexturl, cursor, db, mode):
     for p in postsoup:
         postbody = re.sub(r"[\n\t]*", "", p.text) # clean out tab, newlines
         bodylist.append(postbody)
-    checksum = int(len(bodylist)) # This val returns to iterator() 
+    checksum = int(len(bodylist))+int(len(modsoup)) # This val returns to iterator() 
+
     global previouslyaddedbody # fetch global variable, see top of this file.
     if bodylist == previouslyaddedbody: # test if previous page is identical.
         print("Found duplicate page, exiting or continuing to next url")
@@ -136,7 +139,8 @@ def parsethread(nexturl, cursor, db, mode):
         else:
             inreplylist.append("none")
     # And now add to database: 
-    for n in range(0,12):
+    for n in range(0,len(bodylist)):
+
         try:
             cursor.execute('''
             INSERT INTO fb(idnumber, user, date, time, body, 
