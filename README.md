@@ -1,10 +1,10 @@
 # Flashbackscraper
-A simple python script for scraping [Flasback.org](https://flashback.org) forum threads. It uses BeautifulSoup to parse the html responses from the forum, this way avoiding any (known) limitations in how much data can be fetched. Features include:
+A simple python script for scraping [flashback.org](https://flashback.org) forum threads. It uses BeautifulSoup to parse the html responses from the forum, this way avoiding any (known) limitations in how much data can be fetched. Features include:
 
 * Scraping of entire threads.
 * Scraping of multiple threads from a file list.
 * Scraping a subforum for thread urls, which then can be scraped as multiple threads.
-* Running the scraper through the Tor socks5 proxy (experimental feature, do not use for opsec). 
+* Running the scraper through the Tor socks5 proxy (experimental feature, do not use for opsec).
 
 ![Terminal demo](https://digitalametoder.science/files/render1544006868267.gif)
 
@@ -57,7 +57,7 @@ Then you can run the ``-f`` option, as above, to get all the posts of all the tr
 
     python flashbackscraper.py -f f328.txt
 
-**Warning:** This will create a lot of requests and network traffic. **Use responsibly!**. 
+**Warning:** This will create a lot of requests and network traffic. **Use responsibly!**.
 
 
 
@@ -65,12 +65,12 @@ Then you can run the ``-f`` option, as above, to get all the posts of all the tr
 
 ### Example data analysis
 
-In the folder ``flashback_data_analysis`` you will find a Jupyter notebook called ``filosofer.ipynb``, which contains some example analysis approaches. It also shows how you can read a Pandas dataframe from the .sqlite3 database and how to parse date and time correctly. 
+In the folder ``flashback_data_analysis`` you will find a Jupyter notebook called ``filosofer.ipynb``, which contains some example analysis approaches. It also shows how you can read a Pandas dataframe from the .sqlite3 database and how to parse date and time correctly.
 
 
 ### Run scraper through Tor darknet
 
-By adding the ``-t`` flag, you may run the https requests through the Tor socks5 proxy on port 9050. This requires that you have [Tor installed](https://torproject.org) on your system and that there is a functioning proxy on the standard Tor port. This feature is still a bit experimental, so **do not rely on it for anonymity**. 
+By adding the ``-t`` flag, you may run the https requests through the Tor socks5 proxy on port 9050. This requires that you have [Tor installed](https://torproject.org) on your system and that there is a functioning proxy on the standard Tor port. This feature is still a bit experimental, so **do not rely on it for anonymity**.
 
 
 
@@ -80,4 +80,4 @@ If you want to map the network created as an effect of the "quote" function in t
 
     python sqlite2gexf <name of sqlite3 file>
 
-See the file ``t2977018.gexf`` in the example_outputs folder as an example. 
+See the file ``t2977018.gexf`` in the example_outputs folder as an example.
