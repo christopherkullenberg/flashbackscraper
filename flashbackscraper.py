@@ -185,31 +185,83 @@ def parsesubforum(subforumurl):
     urls and writing them to a file, it closes the file and exits.'''
     iterator = 1
     outfile = open(subforumurl[26:] + ".txt", "w")
-    while True:
-        currenturl = subforumurl + "p" + str(iterator)
-        r = requests.get(currenturl)
-        html = r.content
-        soup = BeautifulSoup(html, "lxml")
-        print("Collecting threads from", currenturl)
-        topics = soup.findAll('a', id=re.compile("thread_title_\d"))
-        print("Found " + str(len(topics)) + " threads")
-        if len(topics) >= 50:
-            for t in topics:
-                threadurl = 'https://flashback.org' + t.get('href')
-                print(threadurl)
-                outfile.write(threadurl + "\n")
-            iterator += 1
-        elif len(topics) < 50:
-            for t in topics:
-                threadurl = 'https://flashback.org' + t.get('href')
-                print(threadurl)
-                outfile.write(threadurl + "\n")
-            print("Done, writing to file and exiting")
-            outfile.close()
-            print('''\n You can now run python3 flashbackscraper.py -f ''' 
-                  + subforumurl[26:] + '''.txt''')
-            sys.exit()
+   
+    # Get and parse html:
+    global usetor # Check if Tor mode is on or off
+    global user_agent_list # get large list of various headers
+    user_agent = random.choice(user_agent_list)
+    headers = {'User-Agent': user_agent}
+    print("Using header:", headers)
+    
  
+    if usetor == True:
+        print("---> Running in Tor mode!")
+        try:
+            session = requests.session()
+            session.proxies['https'] = 'socks5h://localhost:9050' # requires Tor
+            
+            while True:
+                currenturl = subforumurl + "p" + str(iterator)
+                r = session.get(currenturl, headers=headers)
+                html = r.content
+                soup = BeautifulSoup(html, "lxml")
+                print("Collecting threads from", currenturl)
+                topics = soup.findAll('a', id=re.compile("thread_title_\d"))
+                print("Found " + str(len(topics)) + " threads")
+                
+                if len(topics) >= 50:
+                    for t in topics:
+                        threadurl = 'https://flashback.org' + t.get('href')
+                        print(threadurl)
+                        outfile.write(threadurl + "\n")
+                    iterator += 1  
+            
+                elif len(topics) < 50:
+                    for t in topics:
+                        threadurl = 'https://flashback.org' + t.get('href')
+                        print(threadurl)
+                        outfile.write(threadurl + "\n")
+                    print("Done, writing to file and exiting")
+                    outfile.close()
+                    print('''\n You can now run python3 flashbackscraper.py -f ''' 
+                      + subforumurl[26:] + '''.txt''')
+                    sys.exit()      
+                
+        except: #there are multiple errors for a Tor conn to go wrong
+                print("There was an ERROR with TOR. Proceeding to next url")
+                with open("failed_urls.txt", "a") as failfile:
+                    failfile.write(nexturl + "\n") # record failed urls
+                return(9000)        
+        
+    elif usetor == False:
+            
+            while True:
+                currenturl = subforumurl + "p" + str(iterator)
+                r = requests.get(currenturl, headers=headers)
+                html = r.content
+                soup = BeautifulSoup(html, "lxml")
+                print("Collecting threads from", currenturl)
+                topics = soup.findAll('a', id=re.compile("thread_title_\d"))
+                print("Found " + str(len(topics)) + " threads")
+
+                if len(topics) >= 50:
+                    for t in topics:
+                        threadurl = 'https://flashback.org' + t.get('href')
+                        print(threadurl)
+                        outfile.write(threadurl + "\n")
+                    iterator += 1
+
+                elif len(topics) < 50:
+                    for t in topics:
+                        threadurl = 'https://flashback.org' + t.get('href')
+                        print(threadurl)
+                        outfile.write(threadurl + "\n")
+                    print("Done, writing to file and exiting")
+                    outfile.close()
+                    print('''\n You can now run python3 flashbackscraper.py -f ''' 
+                      + subforumurl[26:] + '''.txt''')
+                    sys.exit()      
+                
 def iterator(starturl, cursor, db, mode):
     '''This function makes possible to go through all urls in a thread. It 
     takes the first url of a thread, then simply adds "p[n]", where n = a number    increasing by 1 until it receives a number which is either less than 12 or 
